@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: production
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: jocaloide/infra-project-frontend:1
+        env:
+        - name: REACT_APP_API_URL
+          value: "http://10.32.0.5:4000"
+        - name: REACT_APP_WEBSOCKET
+          value: "ws://10.32.0.4:5000"
+        ports:
+        - containerPort: 80
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-svc
+  namespace: production
+spec:
+  selector:
+    app: frontend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer 
